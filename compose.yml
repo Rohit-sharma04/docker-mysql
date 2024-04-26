@@ -1,0 +1,39 @@
+services:
+
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    networks:
+      -  todo-network
+    depends_on:
+      - server  
+
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    networks:
+      -  todo-network  
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: your_mysql_root_password
+      MYSQL_DATABASE: todo_list
+    networks:
+      -  todo-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/schema.sql 
+
+ 
+volumes:
+  # Correct indentation (one level below "volumes:")
+  mysql_data: {}
+
+networks:
+  todo-network:
